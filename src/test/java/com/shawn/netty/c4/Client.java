@@ -18,8 +18,8 @@ public class Client {
         // 并行启动客户端：右上角Edit Configurations... -> Modify options -> Allow multiple instances
         SocketAddress address = sc.getLocalAddress();
 //        sc.write(Charset.defaultCharset().encode("hello\nworld\n"));
-        sc.write(Charset.defaultCharset().encode("0123456789abcdef3333\n"));
-        System.in.read();
-//        System.out.println("waiting...");
+//        sc.write(Charset.defaultCharset().encode("0123456789abcdef3333\n"));
+//        System.in.read();
+        System.out.println("waiting...");
     }
 }
