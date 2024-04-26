@@ -1,21 +1,17 @@
-package com.shawn.netty.c4;
+package com.shawn.nio.c4;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.SelectionKey;
-import java.nio.channels.Selector;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
+import java.nio.channels.*;
 import java.util.Iterator;
 
-import static com.shawn.netty.c1.ByteBufferUtil.debugAll;
+import static com.shawn.nio.c1.ByteBufferUtil.debugAll;
 
 @Slf4j
-public class OverSizeServer {
+public class Server {
 
     private static void split(ByteBuffer source) {
         source.flip();
@@ -71,7 +67,10 @@ public class OverSizeServer {
                     SocketChannel sc = channel.accept();
                     // selector 配合非阻塞模式一起用
                     sc.configureBlocking(false);
-                    SelectionKey scKey = sc.register(selector, 0, null);
+                    // 附件：attachment
+                    // 将一个 ByteBuffer 作为附件关联到 selectionKey 上
+                    ByteBuffer buffer = ByteBuffer.allocate(16);
+                    SelectionKey scKey = sc.register(selector, 0, buffer);
                     scKey.interestOps(SelectionKey.OP_READ);
                     log.debug("{}", sc);
                     log.debug("scKey: {}", scKey);
@@ -81,16 +80,29 @@ public class OverSizeServer {
                         // 读取数据的事件
                         // 拿到触发事件的channel
                         SocketChannel channel = (SocketChannel) key.channel();
-                        ByteBuffer buffer = ByteBuffer.allocate(16);
+                        // 获取 selectionKey 上关联的附件
+                        ByteBuffer buffer = (ByteBuffer) key.attachment();
+                        // 实际内容长度超过ByteBuffer缓冲区不会报错，会触发两次读事件
+                        // ByteBuffer不能是局部变量，应该在两次读事件发生的时候用到的是同一个ByteBuffer
+
+                        // 附件：attachment
+//                        ByteBuffer buffer = ByteBuffer.allocate(16);
                         // 如果是正常断开，read 方法的返回值是 -1
                         int read = channel.read(buffer);
                         if (read == -1) {
                             key.cancel();
                         } else {
-                            buffer.flip();
+//                            buffer.flip();
 //                            debugRead(buffer);
-                            System.out.println(Charset.defaultCharset().decode(buffer));
-//                            split(buffer);
+//                            System.out.println(Charset.defaultCharset().decode(buffer));
+                            split(buffer);
+                            if (buffer.position() == buffer.limit()) {
+                                ByteBuffer newBuffer = ByteBuffer.allocate(buffer.capacity() * 2);
+                                buffer.flip();
+                                // 0123456789abcdef
+                                newBuffer.put(buffer);
+                                key.attach(newBuffer);
+                            }
                         }
                     } catch (IOException e) {
                         log.error("Server.main.error:{}", e.getMessage(), e);
@@ -102,4 +114,46 @@ public class OverSizeServer {
             }
         }
     }
+
+//    public static void main(String[] args) throws IOException {
+//        // 使用 nio 来理解阻塞模式, 单线程处理
+//        // 0. ByteBuffer
+//        ByteBuffer buffer = ByteBuffer.allocate(16);
+//
+//        // 1. 创建了服务器
+//        ServerSocketChannel ssc = ServerSocketChannel.open();
+//        // 切换成非阻塞模式
+//        ssc.configureBlocking(false);
+//        // 2. 绑定监听端口
+//        ssc.bind(new InetSocketAddress(8080));
+//
+//        // 3. 连接集合
+//        List<SocketChannel> channels = new ArrayList<>();
+//        while (true) {
+//            // 4. accept 建立与客户端连接, SocketChannel 用来与客户端之间通信
+//            // 使用日志的好处是可以打印出线程
+////            log.debug("connecting...");
+//            // 阻塞方法，线程停止运行 configureBlocking为false后为非阻塞，线程还会继续运行，但sc是null
+//            SocketChannel sc = ssc.accept();
+//            if (sc != null) {
+//                log.debug("connected... {}", sc);
+//                // 非阻塞模式
+//                sc.configureBlocking(false);
+//                channels.add(sc);
+//            }
+//            for (SocketChannel channel : channels) {
+//                // 5. 接受客户端发送的数据
+//                // 阻塞方法
+////                log.debug("before read... {}", channel);
+//                // 非阻塞，线程仍然会继续运行，如果没有读到数据, read 返回 0
+//                int read = channel.read(buffer);
+//                if (read > 0) {
+//                    buffer.flip();
+//                    debugRead(buffer);
+//                    buffer.clear();
+//                    log.debug("after read...{}", channel);
+//                }
+//            }
+//        }
+//    }
 }

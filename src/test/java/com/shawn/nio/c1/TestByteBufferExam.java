@@ -1,9 +1,6 @@
-package com.shawn.netty.c1;
+package com.shawn.nio.c1;
 
-import javax.swing.*;
 import java.nio.ByteBuffer;
-
-import static com.shawn.netty.c1.ByteBufferUtil.debugAll;
 
 public class TestByteBufferExam {
 
@@ -39,7 +36,7 @@ public class TestByteBufferExam {
                 for (int j = 0; j < length; j++) {
                     target.put(source.get());
                 }
-                debugAll(target);
+                ByteBufferUtil.debugAll(target);
             }
         }
         source.compact();

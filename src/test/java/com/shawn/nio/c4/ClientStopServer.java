@@ -1,5 +1,6 @@
-package com.shawn.netty.c4;
+package com.shawn.nio.c4;
 
+import com.shawn.nio.c1.ByteBufferUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -9,10 +10,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
 import java.util.Iterator;
-
-import static com.shawn.netty.c1.ByteBufferUtil.debugRead;
 
 @Slf4j
 public class ClientStopServer {
@@ -68,7 +66,7 @@ public class ClientStopServer {
                         // sc.close() 正常断开也会触发一次读事件
                         channel.read(buffer);
                         buffer.flip();
-                        debugRead(buffer);
+                        ByteBufferUtil.debugRead(buffer);
                     } catch (IOException e) {
                         log.error("Server.main.error:{}", e.getMessage(), e);
                         // 没必要再监视断开的channel了

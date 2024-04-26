@@ -1,5 +1,6 @@
-package com.shawn.netty.c4;
+package com.shawn.nio.c4;
 
+import com.shawn.nio.c1.ByteBufferUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -9,8 +10,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.shawn.netty.c1.ByteBufferUtil.debugRead;
 
 /**
  * 阻塞是这个事件还没有发生，这个线程就得暂停
@@ -44,6 +43,10 @@ public class NIOServer {
             if (sc != null) {
                 log.debug("connected...{}", sc);
                 // 非阻塞模式
+                /*
+                    非阻塞IO只在等待数据阶段非阻塞，在复制数据阶段用户线程仍然要阻塞
+                    牵扯到多次用户空间和内核空间的切换，影响系统的性能
+                 */
                 sc.configureBlocking(false);
                 channels.add(sc);
             }
@@ -55,7 +58,7 @@ public class NIOServer {
                 int read = channel.read(buffer);
                 if (read > 0) {
                     buffer.flip();
-                    debugRead(buffer);
+                    ByteBufferUtil.debugRead(buffer);
                     buffer.clear();
                     log.debug("after read... {}", channel);
                 }

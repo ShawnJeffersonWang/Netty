@@ -1,11 +1,11 @@
-package com.shawn.netty.c1;
+package com.shawn.nio.c1;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 
-import static com.shawn.netty.c1.ByteBufferUtil.debugAll;
+import static com.shawn.nio.c1.ByteBufferUtil.debugAll;
 
 public class TestScatteringReads {
 

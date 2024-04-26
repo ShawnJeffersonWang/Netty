@@ -1,8 +1,7 @@
-package com.shawn.netty.c4;
+package com.shawn.nio.c4;
 
+import com.shawn.nio.c1.ByteBufferUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -11,8 +10,6 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.shawn.netty.c1.ByteBufferUtil.debugRead;
 
 /**
  * 阻塞模式下，某个方法执行时都会影响另一个方法的执行，accept的时候不能read, read的时候不能accept，让当前线程停止运行了
@@ -42,7 +39,7 @@ public class BIOServer {
                 log.debug("before read... {}", channel);
                 channel.read(buffer);
                 buffer.flip();
-                debugRead(buffer);
+                ByteBufferUtil.debugRead(buffer);
                 buffer.clear();
                 log.debug("after read... {}", channel);
             }

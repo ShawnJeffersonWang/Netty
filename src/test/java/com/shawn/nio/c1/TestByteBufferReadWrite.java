@@ -1,10 +1,10 @@
-package com.shawn.netty.c1;
+package com.shawn.nio.c1;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.ByteBuffer;
 
-import static com.shawn.netty.c1.ByteBufferUtil.debugAll;
+import static com.shawn.nio.c1.ByteBufferUtil.debugAll;
 
 @Slf4j
 public class TestByteBufferReadWrite {

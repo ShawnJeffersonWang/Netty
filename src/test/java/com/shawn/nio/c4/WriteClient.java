@@ -1,4 +1,4 @@
-package com.shawn.netty.c4;
+package com.shawn.nio.c4;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

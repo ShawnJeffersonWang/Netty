@@ -1,4 +1,4 @@
-package com.shawn.netty.test;
+package com.shawn.nio.test;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -10,7 +10,7 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.shawn.netty.c1.ByteBufferUtil.debugAll;
+import static com.shawn.nio.c1.ByteBufferUtil.debugAll;
 
 @Slf4j
 public class MultiThreadServer {
@@ -19,6 +19,12 @@ public class MultiThreadServer {
         Thread.currentThread().setName("master");
         ServerSocketChannel ssc = ServerSocketChannel.open();
         ssc.configureBlocking(false);
+        /*
+        多路复用涉及到两次系统调用进入内核空间，select一次, read一次
+        同步阻塞，同步非阻塞，同步多路复用，异步阻塞（没有此情况），异步非阻塞
+        - 同步：线程自己去获取结果（一个线程）
+        - 异步：线程自己不去获取结果，而是由其他线程送结果（至少两个线程）
+         */
         Selector boss = Selector.open();
         SelectionKey bossKey = ssc.register(boss, 0, null);
         bossKey.interestOps(SelectionKey.OP_ACCEPT);
