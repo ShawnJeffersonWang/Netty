@@ -22,6 +22,7 @@ public class HelloServer {
                 .childHandler(
                         // 5. channel 代表和客户端进行数据读写的通道 Initializer 初始化，负责添加别的 handler
                         new ChannelInitializer<NioSocketChannel>() {
+                            // 连接建立后，调用初始化方法
                             @Override
                             protected void initChannel(NioSocketChannel ch) throws Exception {
                                 // 6. 添加具体 handler
